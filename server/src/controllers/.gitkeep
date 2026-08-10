@@ -1,0 +1,2 @@
+// Route handlers — auth, resources, subjects, admin
+// Extend with controller modules as features are built out.

@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth antialiased;
+  }
+
+  body {
+    @apply font-sans transition-colors duration-300;
+  }
+
+  /* Dark mode (default) */
+  html.dark body {
+    @apply bg-pitch text-slate-100;
+  }
+
+  /* Light mode */
+  html.light body {
+    @apply bg-surface-light text-surface-navy;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-md border border-white/10;
+  }
+
+  html.dark .glass {
+    @apply bg-white/5;
+  }
+
+  html.light .glass {
+    @apply bg-white/70 border-slate-200/80 shadow-sm;
+  }
+
+  .glass-strong {
+    @apply backdrop-blur-lg border;
+  }
+
+  html.dark .glass-strong {
+    @apply bg-slate-900/40 border-white/10;
+  }
+
+  html.light .glass-strong {
+    @apply bg-white/90 border-slate-200;
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.12);
+  }
+
+  .noise-layer {
+    @apply pointer-events-none absolute inset-0 bg-noise opacity-50;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-lg;
+  }
+
+  html.dark .skeleton {
+    @apply bg-white/5;
+  }
+
+  html.light .skeleton {
+    @apply bg-slate-200;
+  }
+}
+
+/* react-pdf overrides */
+.react-pdf__Page__canvas {
+  @apply mx-auto rounded-lg shadow-2xl;
+}
+
+.react-pdf__Page__textContent,
+.react-pdf__Page__annotations {
+  display: none;
+}
