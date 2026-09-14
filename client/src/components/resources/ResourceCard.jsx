@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Star,
@@ -34,6 +34,10 @@ export function ResourceCard({
 }) {
   const [starred, setStarred] = useState(isStarred);
   const typeStyle = TYPE_COLORS[resource.type] || TYPE_COLORS['Class Notes'];
+
+  useEffect(() => {
+    setStarred(isStarred);
+  }, [isStarred]);
 
   const handleStar = (e) => {
     e.stopPropagation();

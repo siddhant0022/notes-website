@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -9,9 +9,12 @@ import {
   Menu,
   X,
   LogIn,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../../store';
+import { useLogout } from '../../hooks/useApi';
 
 const navLinks = [
   { to: '/', label: 'Browse', icon: BookOpen },
@@ -21,14 +24,21 @@ const navLinks = [
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
+  const navigate = useNavigate();
+  const logout = useLogout();
+
+  const handleLogout = () => {
+    logout.mutate(undefined, { onSuccess: () => navigate('/') });
+    setMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 dark:border-white/5 light:border-slate-200/60">
       <div className="glass-strong">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center group-hover:glow-accent transition-shadow">
               <BookOpen className="w-4 h-4 text-accent" />
@@ -38,7 +48,6 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map(({ to, label, icon: Icon }) => (
               <NavLink
@@ -70,7 +79,11 @@ export function Navbar() {
             {user?.role === 'Admin' && (
               <NavLink
                 to="/admin"
-                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-accent flex items-center gap-2"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                    isActive ? 'text-accent' : 'text-slate-400 hover:text-accent'
+                  }`
+                }
               >
                 <LayoutDashboard className="w-4 h-4" />
                 Admin
@@ -78,14 +91,42 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-3">
             <ThemeToggle />
             {isAuthenticated ? (
-              <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-white/10">
-                <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-xs font-bold text-accent">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </div>
+              <div className="relative hidden sm:block pl-3 border-l border-white/10">
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                >
+                  <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-xs font-bold text-accent">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                </button>
+                <AnimatePresence>
+                  {menuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        className="absolute right-0 top-full mt-2 w-48 glass-strong rounded-xl py-1 z-50 shadow-xl"
+                      >
+                        <div className="px-4 py-2 border-b border-white/10">
+                          <p className="text-sm font-medium truncate">{user?.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                        </div>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full px-4 py-2.5 text-left text-sm text-slate-400 hover:text-red-400 hover:bg-white/5 flex items-center gap-2 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <Link
@@ -106,7 +147,6 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Mobile Menu */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
@@ -131,6 +171,34 @@ export function Navbar() {
                     {label}
                   </Link>
                 ))}
+                {user?.role === 'Admin' && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-white/5"
+                  >
+                    <LayoutDashboard className="w-4 h-4" /> Admin
+                  </Link>
+                )}
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-white/5"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-accent"
+                  >
+                    <User className="w-4 h-4" /> Sign In
+                  </Link>
+                )}
               </div>
             </motion.div>
           )}

@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { Navbar } from './Navbar';
 
 export function AppLayout() {
@@ -21,9 +21,9 @@ export function AppLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>&copy; {new Date().getFullYear()} GCETNotes. Built for students, by students.</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-accent transition-colors">About</a>
-            <a href="#" className="hover:text-accent transition-colors">Guidelines</a>
-            <a href="#" className="hover:text-accent transition-colors">Contact</a>
+            <Link to="/about" className="hover:text-accent transition-colors">About</Link>
+            <Link to="/guidelines" className="hover:text-accent transition-colors">Guidelines</Link>
+            <Link to="/contact" className="hover:text-accent transition-colors">Contact</Link>
           </div>
         </div>
       </footer>

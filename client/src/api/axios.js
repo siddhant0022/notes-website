@@ -16,7 +16,9 @@ api.interceptors.response.use(
 
     switch (status) {
       case 401:
-        toast.error('Session expired. Please log in again.');
+        if (!error.config?.skipGlobalError) {
+          toast.error('Session expired. Please log in again.');
+        }
         break;
       case 403:
         toast.error(message || 'You do not have permission.');
